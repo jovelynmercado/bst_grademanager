@@ -8,6 +8,8 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
+const ENABLE_OIDC = !!process.env.REPL_ID;
+
 const getOidcConfig = memoize(
   async () => {
     return await client.discovery(
@@ -61,6 +63,77 @@ async function upsertUser(claims: any) {
 }
 
 export async function setupAuth(app: Express) {
+  if (!ENABLE_OIDC) {
+    const sessionTtl = 7 * 24 * 60 * 60 * 1000;
+    app.set("trust proxy", 1);
+    app.use(
+      session({
+        secret: process.env.SESSION_SECRET || "dev-secret",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          httpOnly: true,
+          secure: false,
+          maxAge: sessionTtl,
+        },
+      }),
+    );
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+    // Simple dev login endpoint. Use seeded credentials from the SQL.
+    // Admin: admin@gmail.com / admin123
+    // Student: student1@hcdc.edu.ph / student123
+    app.post("/api/login", async (req: any, res) => {
+      try {
+        const { email, password } = req.body || {};
+        if (!email || !password) return res.status(400).json({ message: "Missing credentials" });
+
+        // dev-only hardcoded checks (do not use in production)
+        if (email === "admin@gmail.com" && password === "admin123") {
+          const user = {
+            claims: { sub: "dev-admin", email, first_name: "Site", last_name: "Admin" },
+            access_token: null,
+            refresh_token: null,
+            expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 8,
+          };
+          req.login(user, (err: any) => {
+            if (err) return res.status(500).json({ message: "Login failed" });
+            return res.json({ ok: true, role: "admin" });
+          });
+          return;
+        }
+
+        if (email.endsWith("@hcdc.edu.ph") && password === "student123") {
+          const user = {
+            claims: { sub: "dev-student", email, first_name: "John", last_name: "Student" },
+            access_token: null,
+            refresh_token: null,
+            expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 8,
+          };
+          req.login(user, (err: any) => {
+            if (err) return res.status(500).json({ message: "Login failed" });
+            return res.json({ ok: true, role: "student" });
+          });
+          return;
+        }
+
+        return res.status(401).json({ message: "Invalid credentials" });
+      } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Login error" });
+      }
+    });
+
+    app.get("/api/logout", (req: any, res) => {
+      req.logout?.(() => res.redirect("/"));
+    });
+
+    console.log("OIDC disabled: running in development auth fallback mode");
+    return;
+  }
+
+  // OIDC / Replit setup
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
@@ -128,7 +201,19 @@ export async function setupAuth(app: Express) {
   });
 }
 
-export const isAuthenticated: RequestHandler = async (req, res, next) => {
+export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
+  if (!ENABLE_OIDC) {
+    const user = req.user as any;
+    if (!user || !user.claims || !user.claims.sub) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const now = Math.floor(Date.now() / 1000);
+    if (user.expires_at && now > user.expires_at) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    return next();
+  }
+
   const user = req.user as any;
 
   if (!req.isAuthenticated() || !user.expires_at) {
