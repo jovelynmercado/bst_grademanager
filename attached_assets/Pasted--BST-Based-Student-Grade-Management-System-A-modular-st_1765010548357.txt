@@ -1,0 +1,1396 @@
+
+BST–Based Student Grade Management System
+A modular, structured digital grading workflow system using MySQL for persistent data and a Binary Search Tree engine for optimized searching, ordering, and academic demonstration of data structure operations.
+
+1. FEATURES (FULL LIST)
+A. Admin Features
+1. Student & Subject Management
+Add, edit, delete students (Name, Student ID, Email).
+
+
+Add, edit, delete subjects (code, title).
+
+
+Bulk student upload (CSV).
+
+
+Bulk subject upload (CSV).
+
+
+Merge duplicate student records.
+
+
+Lock or archive old academic terms.
+
+
+2. Grade Management
+Create assessments per subject (Quizzes, Exams, Projects).
+
+
+Set weight, maximum score, and category for each assessment.
+
+
+Record grades for individual students.
+
+
+Bulk grade encoding via CSV.
+
+
+Edit and delete grade entries.
+
+
+Automatic weighted grade computation.
+
+
+Grade history (previous versions per student).
+
+
+3. BST Operations & Visualization
+Build BST for:
+
+
+Student ID
+
+
+Final grade
+
+
+Assessment score
+
+
+View real-time visual BST representation (SVG/Canvas).
+
+
+Show step-by-step BST operations:
+
+
+Insert
+
+
+Search
+
+
+Delete
+
+
+In-order / Pre-order / Post-order traversal
+
+
+Export BST as JSON.
+
+
+Auto-balance mode (optional AVL/RBT demonstration).
+
+
+Educational mode (show comparisons, rotations, pointer changes).
+
+
+4. Reports & Analytics
+Per-student grade summary (all subjects).
+
+
+Per-subject distribution graphs.
+
+
+Assessment-level statistics (mean, median, top/bottom performers).
+
+
+Exportable CSV/PDF grade sheets.
+
+
+Automated ranking per subject (using BST in-order output).
+
+
+Report generation per class, subject, term.
+
+
+5. User & Role Management
+Admin accounts (full access).
+
+
+Teacher accounts (restricted by subject or class).
+
+
+Optional: Viewer/Auditor role (read-only).
+
+
+View activity logs (who edited what).
+
+
+Role-based permissions for grade editing.
+
+
+6. System Administration
+Backup/restore database.
+
+
+Reset academic term (archive data).
+
+
+Email notifications setup.
+
+
+Configure grading formulas.
+
+
+Import/export entire academic dataset.
+
+
+
+B. Teacher Features
+View assigned classes and subjects.
+
+
+Encode or update grades per assessment.
+
+
+View computed final grades in real-time.
+
+
+View student performance summaries.
+
+
+Run BST visualizations for their own classes.
+
+
+Generate downloadable grade sheets.
+
+
+Receive system alerts (missing data, invalid grades, inconsistencies).
+
+
+
+C. Student Features
+Login via Student ID.
+
+
+View personal profile and enrolled subjects.
+
+
+View all grades grouped per subject.
+
+
+Download PDF grade summary.
+
+
+View BST demonstration of their own record (optional educational feature).
+
+
+Request correction (admin approval required).
+
+
+Access archived grades from previous terms.
+
+
+
+2. TECH STACK (RECOMMENDED)
+Frontend
+Next.js 14+ (App Router)
+
+
+React Query for client-side caching
+
+
+Tailwind CSS for UI layout
+
+
+Headless UI for accessible components
+
+
+Axios for API requests
+
+
+d3.js or React Flow for BST visualization
+
+
+Recharts for grade analytics charts
+
+
+TypeScript (strict mode)
+
+
+Backend (within Next.js API Routes)
+Node.js (serverless or custom server)
+
+
+Typescript-based BST module
+
+
+Drizzle ORM or Prisma for structured MySQL interaction
+
+
+Zod for request validation
+
+
+bcrypt for password hashing
+
+
+Database
+MySQL (XAMPP local)
+
+
+InnoDB engine
+
+
+Proper indexing on:
+
+
+student_id
+
+
+subject_id
+
+
+assessment_id
+
+
+score
+
+
+Authentication
+NextAuth (Credentials Provider)
+ or custom JWT via Server Actions.
+
+
+PDF / CSV / Import-Export
+pdfkit or puppeteer (HTML → PDF)
+
+
+fast-csv for CSV parsing
+
+
+
+3. SYSTEM FLOW (DETAILED)
+1. User Authentication
+Admin/Teacher/Student logs in → credentials validated → role-specific dashboard loaded.
+2. Student & Subject Setup
+Admin imports or manually creates students and subjects → system validates entries → DB stores records.
+3. Assessment & Grade Entry
+Teacher creates assessments → specifies weights → encodes grades manually or via CSV → DB stores grade rows → system auto-generates updated final grades.
+4. BST Construction
+Admin/Teacher selects:
+Build BST by student ID
+
+
+Build BST by grade
+
+
+Build BST by assessment score
+
+
+System fetches relevant data → constructs BST in-memory → returns:
+Node relationships
+
+
+Insert paths
+
+
+Traversal logs
+
+
+Search steps
+
+
+This is used for both:
+Search optimization
+
+
+Visualization/academic demonstration
+
+
+5. BST Search Flow
+User searches for student or grade → server constructs BST → executes search() → returns:
+Node found
+
+
+All traversal steps
+
+
+BST subset for visualization
+
+
+6. Reports Generation
+User selects reporting type → server fetches MySQL data → optional BST traversal for sorting → exports:
+Grade sheets
+
+
+Subject analytics
+
+
+Class ranking
+
+
+PDF summaries
+
+
+7. Term Archiving
+Admin closes academic term → system moves records to archive tables → clears active tables → maintains access for history viewing.
+
+4. SCREENS & MODULES
+ADMIN SCREENS
+1. Login Screen
+Email / Username
+
+
+Password
+
+
+“Forgot Password”
+
+
+“Sign In”
+
+
+2. Dashboard
+Widgets:
+Total students
+
+
+Total subjects
+
+
+Total assessments
+
+
+Final grades computed
+
+
+Pending corrections
+
+
+Recent activity table
+ Quick actions: Add Student, Add Subject, Add Assessment, View Reports
+
+3. Students List
+Columns:
+Student ID
+
+
+Name
+
+
+Email
+
+
+Subjects enrolled
+
+
+Actions: View, Edit, Remove
+
+
+Filters:
+Name
+
+
+Student ID
+
+
+Active/Archived
+
+
+
+4. Student Profile
+Tabs:
+Summary
+
+
+Individual grades
+
+
+BST representation for their scores
+
+
+History log
+
+
+
+5. Subjects List
+Columns:
+Subject code
+
+
+Title
+
+
+Teacher assigned
+
+
+Number of assessments
+
+
+Actions: View, Edit
+
+
+
+6. Assessment & Grade Entry
+Assessment Builder:
+Assessment Name
+
+
+Category
+
+
+Weight
+
+
+Max Score
+
+
+Grade Input UI:
+Table of students
+
+
+Inline editing
+
+
+Bulk CSV update
+
+
+Validation highlighting
+
+
+
+7. BST Visualizer
+Left side:
+Dropdown: Key Type (Student ID, Grade, Score)
+
+
+Button: Build Tree
+
+
+Toggle: Auto-balance
+
+
+Center:
+SVG or Canvas BST Diagram (animated)
+
+
+Right side:
+Traversal logs
+
+
+Insert path logs
+
+
+Search comparison logs
+
+
+
+8. Analytics & Reports
+Grade distribution graph
+
+
+Top performers list
+
+
+Low-performing students flagging
+
+
+Export (CSV/PDF)
+
+
+Term overview report
+
+
+
+9. System Administration
+User roles
+
+
+Audit logs
+
+
+Backups
+
+
+Term reset
+
+
+Email settings
+
+
+
+TEACHER SCREENS
+1. Assigned Classes
+Table of classes/subjects → links to grade entry and analytics.
+2. Grade Entry Page
+Assessment selector
+
+
+Student list with editable scores
+
+
+Auto-computed final grade preview
+
+
+3. Class Analytics
+Grade curve
+
+
+Pass/fail distribution
+
+
+Ranking (via BST in-order output)
+
+
+4. BST Classroom Mode
+Build BST for their class only
+
+
+View search paths
+
+
+Compare scores using tree walk
+
+
+
+STUDENT SCREENS
+1. Student Login
+Student ID / Password
+
+
+“My Grades” button
+
+
+2. Dashboard
+Profile
+
+
+Subjects enrolled
+
+
+Notifications
+
+
+3. Grades per Subject
+Assessment breakdown
+
+
+Final grade computation
+
+
+Download report (PDF)
+
+
+4. BST Learning Mode (optional)
+See how a BST searches and locates their record
+
+
+View personal node position
+
+
+
+5. UI DESIGN NOTES
+General Layout Principles
+Clean, academic aesthetic
+
+
+Light theme with Slate/Gray palette
+
+
+Consistent spacing using Tailwind 4–6 spacing units
+
+
+Card-based structure with subtle shadows
+
+
+Data-dense tables with sticky headers
+
+
+Admin Dashboard Layout
+
+| Logo (left) | Profile/Logout |
+| Metrics Cards (Row): |
+| [Students] [Subjects] [Assessments] [Grades Today] |
+| Recent Activity |
+| Table: Description | User | Timestamp |
+Student List Layout
+Search bar
+ Table with sortable headers
+ Inline editing for quick student info corrections
+Grade Entry Layout
+Two-column grid:
+ Left: Assessment selector
+ Right: Editable grade table
+Validation colors:
+Green = valid
+
+
+Yellow = missing
+
+
+Red = invalid (exceeds max score, non-numeric, etc.)
+
+
+BST Visualizer UI
+Center canvas with auto-scaling
+ Nodes represented as circles with labels
+ Lines indicating parent-child relationships
+ Playback controls:
+Step back
+
+
+Step forward
+
+
+Auto-play
+
+
+In-order, pre-order, post-order
+
+
+Reports UI
+Sidebar of report types
+ Main area rendering graphs and tables
+ Export at top-right
+
+FULL UI LAYOUT DESCRIPTION (ALL SCREENS + FUNCTIONS)
+
+1. ADMIN SCREENS
+
+1.1. Login Screen
+Page Layout
+Centered card (width ~400px)
+
+
+University/School logo at top
+
+
+Two input fields:
+
+
+Email/Username
+
+
+Password
+
+
+Buttons:
+
+
+Sign In (primary)
+
+
+Forgot Password? (link)
+
+
+Footer: Copyright notice
+
+
+UX Behavior
+Invalid login → red error box above form
+
+
+Keyboard “Enter” submits
+
+
+Loading spinner inside button during authentication
+
+
+
+1.2. Admin Dashboard
+Top Bar
+Left: System Logo & Title
+
+
+Right: Admin Profile (avatar, dropdown with Settings/Logout)
+
+
+Main Layout (3 sections)
+A. Metrics Row (4 Cards)
+Each card:
+Icon (Students/Subjects/Assessments/Grades)
+
+
+Large number
+
+
+Caption
+
+
+Subtle animation on load
+
+
+Cards:
+Total Students
+
+
+Total Subjects
+
+
+Total Assessments
+
+
+Grades Computed Today
+
+
+B. Quick Actions Row
+Icon buttons:
+Add Student
+
+
+Add Subject
+
+
+Add Assessment
+
+
+View Reports
+ (Placed horizontally under metrics)
+
+
+C. Recent Activity Table
+Columns:
+Description
+
+
+Performed By
+
+
+Role
+
+
+Timestamp
+ Pagination at bottom
+
+
+
+1.3. Students List Page
+Top Section
+Title: “Students”
+
+
+Right side: Buttons → Add Student, Bulk Upload CSV
+
+
+Filters Bar (below title)
+Search input (by name or student ID)
+
+
+Dropdown: Active / Archived
+
+
+Sort dropdown: ID / Name / Email
+
+
+Table Layout
+Columns:
+Student ID (sortable)
+
+
+Name
+
+
+Email
+
+
+Subjects Enrolled
+
+
+Status (active/archived)
+
+
+Action buttons: View | Edit | Archive/Delete
+
+
+UX Features
+Sticky header when scrolling
+
+
+Inline edit for email/name
+
+
+Pagination
+
+
+Bulk select checkboxes (archive/delete multiple)
+
+
+
+1.4. Student Profile Page
+Header Section
+Student photo (optional)
+
+
+Student ID, Name, Email
+
+
+Button group: Edit | Remove | Merge Duplicate Record
+
+
+Tabs Under Header
+Summary
+
+
+Grades
+
+
+BST Visualization
+
+
+History Log
+
+
+
+A. Summary Tab
+Two-column layout:
+
+
+Left: Personal info card
+
+
+Right: Subjects enrolled card
+
+
+Cards show:
+
+
+Subject code
+
+
+Subject title
+
+
+Teacher
+
+
+
+B. Grades Tab
+Select Subject dropdown → loads assessment table
+
+
+Table Columns:
+
+
+Assessment name
+
+
+Category
+
+
+Score / Max Score
+
+
+Weight
+
+
+Computed contribution
+
+
+Final grade box at bottom (large, highlighted)
+
+
+
+C. BST Visualization Tab
+Left Panel:
+Dropdown: Key Type (ID, Final Grade, Score)
+
+
+Button: Build Tree
+
+
+Toggle: Auto Balance
+
+
+Buttons: Insert / Search / Delete (for demo)
+
+
+Center Panel:
+Canvas/SVG BST diagram
+
+
+Auto-scaling
+
+
+Animated insert/search highlights
+
+
+Right Panel:
+Operation logs:
+
+
+Insert path
+
+
+Search comparisons
+
+
+Traversal output
+
+
+
+D. History Log Tab
+Table listing:
+Old value → new value
+
+
+Field changed
+
+
+Modified by
+
+
+Timestamp
+
+
+
+1.5. Subjects List Page
+Top Section:
+Title + button: Add Subject / Bulk Upload
+
+
+Filters: Search, Teacher Assigned
+
+
+Table
+Columns:
+Code
+
+
+Title
+
+
+Teacher
+
+
+Assessments count
+
+
+Actions: View | Edit | Delete
+
+
+
+1.6. Subject Detail / Assessment Page
+Subject Header
+Subject title
+
+
+Subject code
+
+
+Teacher
+
+
+Button: Add Assessment
+
+
+Assessment List
+Table columns:
+Assessment Name
+
+
+Category
+
+
+Weight
+
+
+Max Score
+
+
+Actions (View, Edit, Delete)
+
+
+
+1.7. Grade Entry Page
+Two-Column Layout
+Left (Sidebar Panel)
+Assessment selector dropdown
+
+
+“Create new assessment” button
+
+
+Info card (weight, max score, category)
+
+
+Right (Main Content)
+Editable grade table
+ Columns:
+
+
+Student ID
+
+
+Student Name
+
+
+Score input field
+
+
+Status indicator (valid, missing, invalid)
+
+
+Last updated timestamp
+
+
+Features:
+Auto-save (debounced)
+
+
+Import CSV button (top right)
+
+
+Validation colors:
+
+
+Green = valid
+
+
+Yellow = missing
+
+
+Red = invalid (exceeds max score)
+
+
+
+1.8. BST Visualizer (Admin)
+Three-Panel Layout
+Left Controls Panel
+Dropdown: Key type (ID / Grade / Score)
+
+
+Buttons:
+
+
+Build Tree
+
+
+Add Node
+
+
+Remove Node
+
+
+Auto-balance toggle
+
+
+Traversal buttons (In, Pre, Post)
+
+
+Center Panel
+Large SVG/Canvas area
+
+
+Animated node insertion, linking, deletion
+
+
+Zoom & pan controls
+
+
+Right Logs Panel
+Log window showing:
+
+
+Insert path steps
+
+
+Search comparisons
+
+
+Rotations (if AVL)
+
+
+Playback controls:
+Step Back
+
+
+Step Forward
+
+
+Auto Play
+
+
+
+1.9. Analytics & Reports Page
+Left Sidebar
+Navigation menu:
+
+
+Grade Distribution
+
+
+Top Performers
+
+
+Low Performers
+
+
+Class Ranking
+
+
+Term Report
+
+
+Main Content (varies by selection)
+Graphs (Recharts)
+Histogram for grade distribution
+
+
+Line chart for grade trends
+
+
+Pie chart for pass/fail
+
+
+Tables
+Ranked list (sortable)
+
+
+Export buttons (CSV/PDF)
+
+
+
+1.10. System Administration
+Sections:
+User Roles
+
+
+Activity Logs
+
+
+Backups
+
+
+Email Settings
+
+
+Term Reset
+
+
+Each section uses:
+Forms with validation
+
+
+Data tables
+
+
+Action confirmation modals (e.g., “Reset Term — Are you sure?”)
+
+
+
+2. TEACHER SCREENS
+
+2.1. Teacher Dashboard
+Layout
+Metrics cards:
+
+
+Subjects assigned
+
+
+Assessments this term
+
+
+Pending grade corrections
+
+
+List of assigned subjects (table format)
+
+
+
+2.2. Assigned Classes Page
+Table:
+Subject code
+
+
+Subject title
+
+
+Class info
+
+
+Buttons:
+
+
+Enter Grades
+
+
+View Analytics
+
+
+BST Classroom Mode
+
+
+
+2.3. Grade Entry (Teacher)
+Same layout as admin grade entry, but:
+No delete student option
+
+
+Only their assigned subjects appear
+
+
+Real-time final grade preview panel on right
+
+
+
+2.4. Class Analytics
+Graphs:
+Grade curve
+
+
+Pass/fail percentage
+
+
+Median, mean
+
+
+Tables:
+Student ranking (sorted by BST in-order traversal)
+
+
+Export button
+
+
+
+2.5. BST Classroom Mode
+Same as admin BST visualizer but:
+Restricted to students under this teacher
+
+
+“Teaching mode” overlays:
+
+
+Highlight comparisons
+
+
+Show pointer changes
+
+
+
+3. STUDENT SCREENS
+
+3.1. Student Login
+Simple two-field login:
+Student ID
+
+
+Password
+
+
+Help link: “Forgot your student password?”
+
+
+
+3.2. Student Dashboard
+Cards:
+Profile information
+
+
+Overall GPA / Final grades
+
+
+Notifications card (“New grade posted”, “Correction approved”)
+
+
+Side navigation:
+My Grades
+
+
+Download Summary
+
+
+BST Learning Mode
+
+
+
+3.3. Grades per Subject
+Dropdown: Choose subject
+ Below:
+ Assessment cards/table:
+Columns:
+Assessment name
+
+
+Score / Max
+
+
+Contribution (weight%)
+
+
+Final grade panel at bottom
+ Download PDF button at top right
+
+3.4. BST Learning Mode
+Two-panel layout:
+Left: explanation text (“How BST finds your record”)
+
+
+Right: interactive tree
+
+
+Search animation with steps:
+
+
+“Comparing X with Y…”
+
+
+“Going left…”
+
+
+Node highlight
+
+
+
+3.5. Request Correction Page
+Form:
+Subject dropdown
+
+
+Assessment dropdown
+
+
+Input field: Describe issue
+
+
+Submit → shows tracking ID
+
+
+
+4. GENERAL UI COMPONENTS & PATTERNS
+
+Global Navigation
+Top horizontal bar (admin/teacher)
+ Left sidebar (optional layout)
+Students → simple top bar navigation
+
+Cards
+Rounded corners (2xl)
+ Shadow-sm
+ Padding 6
+
+Tables
+Sticky headers
+
+
+Row hover highlight
+
+
+Icons for actions
+
+
+Pagination at bottom
+
+
+
+Forms
+Tailwind spacing (gap-4)
+
+
+Zod validation messages under each field
+
+
+
+Modals
+Used for:
+Add/Edit forms
+
+
+Deletion confirmation
+
+
+CSV upload results
+
+
+
