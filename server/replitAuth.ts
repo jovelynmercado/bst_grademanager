@@ -7,6 +7,8 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import bcrypt from "bcryptjs";
+import mysql from "mysql2/promise";
 
 const ENABLE_OIDC = !!process.env.REPL_ID;
 
@@ -81,47 +83,61 @@ export async function setupAuth(app: Express) {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    // Simple dev login endpoint. Use seeded credentials from the SQL.
-    // Admin: admin@gmail.com / admin123
-    // Student: student1@hcdc.edu.ph / student123
+    // Simple serialization for dev mode
+    passport.serializeUser((user: Express.User, cb) => cb(null, user));
+    passport.deserializeUser((user: Express.User, cb) => cb(null, user));
+
+    // Simple dev login endpoint. Query database for credentials and verify password hash.
     app.post("/api/login", async (req: any, res) => {
+      let conn;
       try {
         const { email, password } = req.body || {};
         if (!email || !password) return res.status(400).json({ message: "Missing credentials" });
 
-        // dev-only hardcoded checks (do not use in production)
-        if (email === "admin@gmail.com" && password === "admin123") {
-          const user = {
-            claims: { sub: "dev-admin", email, first_name: "Site", last_name: "Admin" },
-            access_token: null,
-            refresh_token: null,
-            expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 8,
-          };
-          req.login(user, (err: any) => {
-            if (err) return res.status(500).json({ message: "Login failed" });
-            return res.json({ ok: true, role: "admin" });
-          });
-          return;
+        // Query database for user by email using raw MySQL
+        conn = await mysql.createConnection(process.env.DATABASE_URL!);
+        const [rows] = await conn.execute(
+          "SELECT id, email, password_hash, role, first_name, last_name FROM users WHERE email = ?",
+          [email]
+        );
+        
+        if (!Array.isArray(rows) || rows.length === 0) {
+          return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        if (email.endsWith("@hcdc.edu.ph") && password === "student123") {
-          const user = {
-            claims: { sub: "dev-student", email, first_name: "John", last_name: "Student" },
-            access_token: null,
-            refresh_token: null,
-            expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 8,
-          };
-          req.login(user, (err: any) => {
-            if (err) return res.status(500).json({ message: "Login failed" });
-            return res.json({ ok: true, role: "student" });
-          });
-          return;
+        const dbUser = rows[0] as any;
+        if (!dbUser.password_hash) {
+          return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        return res.status(401).json({ message: "Invalid credentials" });
+        // Verify password hash
+        const passwordValid = await bcrypt.compare(password, dbUser.password_hash);
+        if (!passwordValid) {
+          return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        // Create session user
+        const user = {
+          claims: { 
+            sub: dbUser.id, 
+            email: dbUser.email, 
+            first_name: dbUser.first_name || "", 
+            last_name: dbUser.last_name || "",
+            role: dbUser.role
+          },
+          access_token: null,
+          refresh_token: null,
+          expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 8,
+        };
+        req.login(user, (err: any) => {
+          if (err) return res.status(500).json({ message: "Login failed" });
+          return res.json({ ok: true, role: dbUser.role });
+        });
       } catch (err) {
-        console.error(err);
+        console.error("Login error:", err);
         return res.status(500).json({ message: "Login error" });
+      } finally {
+        if (conn) await conn.end();
       }
     });
 

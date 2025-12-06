@@ -20,7 +20,7 @@ export default function Landing() {
             </a>
           </nav>
           <Button asChild data-testid="button-login">
-            <a href="/api/login">Sign In</a>
+            <a href="/login">Sign In</a>
           </Button>
         </div>
       </header>
@@ -40,7 +40,7 @@ export default function Landing() {
               </div>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Button size="lg" asChild data-testid="button-get-started">
-                  <a href="/api/login">Get Started</a>
+                  <a href="/login">Get Started</a>
                 </Button>
                 <Button size="lg" variant="outline" asChild data-testid="button-learn-more">
                   <a href="#features">Learn More</a>

@@ -69,9 +69,9 @@ export function AppSidebar() {
   const getMenuItems = () => {
     switch (user?.role) {
       case "admin":
-        return adminMenuItems;
       case "teacher":
-        return teacherMenuItems;
+        // Treat teacher same as admin
+        return adminMenuItems;
       case "student":
         return studentMenuItems;
       default:
@@ -84,9 +84,8 @@ export function AppSidebar() {
   const getRoleLabel = () => {
     switch (user?.role) {
       case "admin":
-        return "Administrator";
       case "teacher":
-        return "Teacher";
+        return "Administrator";
       case "student":
         return "Student";
       default:

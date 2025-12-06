@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import Landing from "@/pages/landing";
+import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Students from "@/pages/students";
 import Subjects from "@/pages/subjects";
@@ -21,7 +22,7 @@ import Analytics from "@/pages/analytics";
 import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
-function AuthenticatedRouter() {
+function ProtectedRouter() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
@@ -39,7 +40,7 @@ function AuthenticatedRouter() {
   );
 }
 
-function AuthenticatedLayout() {
+function ProtectedLayout() {
   const style = {
     "--sidebar-width": "16rem",
     "--sidebar-width-icon": "3rem",
@@ -55,7 +56,7 @@ function AuthenticatedLayout() {
             <ThemeToggle />
           </header>
           <main className="flex-1 overflow-auto">
-            <AuthenticatedRouter />
+            <ProtectedRouter />
           </main>
         </div>
       </div>
@@ -79,17 +80,21 @@ function LoadingScreen() {
 }
 
 function AppContent() {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
-  if (!isAuthenticated) {
-    return <Landing />;
-  }
-
-  return <AuthenticatedLayout />;
+  return (
+    <Switch>
+      <Route path="/login" component={Login} />
+      <Route
+        path="/*"
+        component={isAuthenticated ? ProtectedLayout : Landing}
+      />
+    </Switch>
+  );
 }
 
 function App() {
